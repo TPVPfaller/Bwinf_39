@@ -1,15 +1,15 @@
 from collections import defaultdict
 
 
-def read(example):
+def read(example):  # Einlesen und Abspeichern
     spaces = list()
     words = defaultdict(list)
     file = open("raetsel" + example + ".txt", "r")
     for line, val in enumerate(file.readlines()):
-        if line:
+        if line:  # Wörter einlesen
             for word in val.split():
                 words[len(word)].append(word)
-        else:
+        else:  # Lücken einlesen
             length, pos = 0, 0
             add, character = "", ""
             for c in val:
@@ -31,7 +31,7 @@ def read(example):
     return spaces, words
 
 
-def solve(spaces, words):
+def solve(spaces, words):  # Hauptalgorithmus
     graph = defaultdict(list)
     res = [""]*len(spaces)
     rest, pos_list = list(), list()
@@ -44,10 +44,11 @@ def solve(spaces, words):
         else:
             pos_list.append(i)
             for word in words[l]:
+                # An der richtigen Position muss der richtige Buchstabe sein
                 if word[pos] == c:
                     graph[word].append(i)
                     graph[i].append(word)
-    print(graph)
+    # Nach und nach enfernen von Knoten (Lücken) mit nur einer Verbindung
     while pos_list:
         j = 0
         for _ in range(len(pos_list)):
@@ -61,14 +62,14 @@ def solve(spaces, words):
                 pos_list.remove(p)
             else:
                 j += 1
-    for l, pos in rest:
+    for l, pos in rest:  # restliche Wörter werden eingesetzt
         res[pos] = words[l][0]
     return res
 
 
 print('Geben Sie die Nummer eines Beispiels ein:')
-spaces, words = read(input())
+spaces, words = read(input())  # Eingabe
 res = solve(spaces, words)
 
-for position, word in enumerate(res):
+for position, word in enumerate(res):  # Ausgabe
     print(word + spaces[position][3], end=" ")
