@@ -1,4 +1,5 @@
-
+from functools import wraps
+from time import time
 
 def read(example):
     file = open("spiesse" + example + ".txt", "r")
@@ -31,6 +32,18 @@ def read(example):
     return wishes, skewers
 
 
+def timing(f):
+    @wraps(f)
+    def wrap(*args, **kw):
+        t0 = time()
+        result = f(*args, **kw)
+        t1 = time()
+        print("Zeit: " + str(round((t1-t0)*1000, 5)) + "ms")
+        return result
+    return wrap
+
+
+@timing
 def solve(wishes, queue):
     solved_fruits = []
     positions = []
@@ -53,6 +66,7 @@ def solve(wishes, queue):
                             positions.append(intersection[0][0])
                             solved_fruits.append(intersection[1][0])
                         queue = remove_fruit(queue, intersection[0][0], intersection[1][0])
+                        del queue[i][0][queue[i]]
                     else:
                         for x in range(len(intersection[0])):
                             p, f = intersection[0][x], intersection[1][x]
@@ -65,22 +79,14 @@ def solve(wishes, queue):
     return solved_fruits, positions, queue
 
 
-def remove_fruit(q, p, f):
-    for i in range(len(q)):
-        if p in q[i][0]:
-            del q[i][0][q[i][0].index(p)]
-        if f in q[i][1]:
-            del q[i][1][q[i][1].index(f)]
-    return q
-
-
 print("Geben Sie hier die Nummer des Beispiels ein (0-7):")
 #wishes, skewers = read(input())
 for i in range(0, 8):
     print("spiesse"+ str(i) + ".txt:")
     wishes, skewers = read(str(i))
 
-    solved_fruits, positions, queue = solve(wishes, skewers)
+    result = solve(wishes, skewers)
+    solved_fruits, positions, queue = result
     for j in range(len(solved_fruits)):
         print('\033[96m' + solved_fruits[j] + '\033[0m' + " ist in der " + '\033[96m' + str(positions[j]) + '\033[0m' + ". Schüssel")
     print()
