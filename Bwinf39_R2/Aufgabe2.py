@@ -1,6 +1,7 @@
 from functools import wraps
 from time import time
 
+
 def read(example):
     file = open("spiesse" + example + ".txt", "r")
     amount = 0
@@ -66,7 +67,6 @@ def solve(wishes, queue):
                             positions.append(intersection[0][0])
                             solved_fruits.append(intersection[1][0])
                         queue = remove_fruit(queue, intersection[0][0], intersection[1][0])
-                        del queue[i][0][queue[i]]
                     else:
                         for x in range(len(intersection[0])):
                             p, f = intersection[0][x], intersection[1][x]
@@ -98,8 +98,7 @@ for i in range(0, 8):
     print("spiesse"+ str(i) + ".txt:")
     wishes, skewers = read(str(i))
 
-    result = solve(wishes, skewers)
-    solved_fruits, positions, queue = result
+    solved_fruits, positions, queue = solve(wishes, skewers)
     for j in range(len(solved_fruits)):
         print('\033[96m' + solved_fruits[j] + '\033[0m' + " ist in der " + '\033[96m' + str(positions[j]) + '\033[0m' + ". Schüssel")
     print()

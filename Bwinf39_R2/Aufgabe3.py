@@ -15,4 +15,5 @@ def read(example):
 def check_result():
     pass
 
+
 print(read(1))
