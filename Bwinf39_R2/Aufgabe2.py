@@ -78,6 +78,13 @@ def solve(wishes, queue):
 
     return solved_fruits, positions, queue
 
+def remove_fruit(q, p, f):
+    for i in range(len(q)):
+        if p in q[i][0]:
+            del q[i][0][q[i][0].index(p)]
+        if f in q[i][1]:
+            del q[i][1][q[i][1].index(f)]
+    return q
 
 
 def remove_fruit(q, p, f):
