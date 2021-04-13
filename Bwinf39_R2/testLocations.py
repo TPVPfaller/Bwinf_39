@@ -14,7 +14,7 @@ def read(example):
     return circumference, amount, adresses
 
 
-def get_dist(locations, addresses, circumference):
+def get_dist(locations):
     distances = []
     for a in addresses:
         z1 = a
@@ -32,15 +32,13 @@ def get_dist(locations, addresses, circumference):
     return distances
 
 
-def check_result(locations, addresses, circumference):
-    initial = get_dist(locations, addresses, circumference)
-    #print(initial)
+def check_result(locations):
+    initial = get_dist(locations)
     for i in range(circumference):
         print(i)
         for j in range(i+1, circumference):
             for k in range(j+1, circumference):
-                cur_dist = get_dist([i, j, k], addresses, circumference)
-                #print(cur_dist)
+                cur_dist = get_dist([i, j, k])
                 count = 0
                 for x in range(len(addresses)):
                     if cur_dist[x] < initial[x]:
@@ -50,11 +48,10 @@ def check_result(locations, addresses, circumference):
                     res = [i, j, k]
                     res.sort()
                     return res
-    return locations
+    return ""
 
 
 circumference, amount, addresses = read(5)
 print(circumference, amount, addresses)
-pos = [83, 128, 231]
-pos = check_result(pos, addresses, circumference)
-print(pos)
+pos = check_result([83, 130, 230])
+print(pos) if pos else print("stable")
