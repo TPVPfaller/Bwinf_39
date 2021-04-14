@@ -39,8 +39,7 @@ def read(example):
                 for j in line.replace("\n", "").split(" "):
                     fruits.add(j)
     # Erstellen eines Spiesses mit allen Früchten aus allen Schüsseln
-    if len(fruits) == amount:
-        skewers.append([[i for i in range(1, amount+1)], list(fruits)])
+    skewers.append([[i for i in range(1, amount+1)], list(fruits)])
     return wishes, skewers
 
 

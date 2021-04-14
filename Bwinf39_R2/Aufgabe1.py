@@ -1,3 +1,6 @@
+from collections import defaultdict
+import tkinter as tk
+import time
 
 
 def read(example):
@@ -7,35 +10,66 @@ def read(example):
     for line in file.readlines():
         time1, time2, space = line.split(" ")
         width = space.rstrip("\n")
-        space = int(width) * (int(time2)-int(time1))
-        shops.append([space, int(width), int(time1) - 8, int(time2) - 8])
+        diff = (int(time2)-int(time1))
+        shops.append([diff, int(width), int(time1) - 8, int(time2) - 8])
     return shops
 
 
-def merge(queue):
+class Draw:
 
+    def __init__(self):
+        root = tk.Tk()
+        root.title("Aufgabe1")
+        root.geometry("1600x400+0+0")
+        self.color_index = 0
+        self.canvas = tk.Canvas(root, bg="white", height=110, width=1510)
+        self.canvas.create_rectangle(10, 10, 1500, 100)
+        self.canvas.pack()
 
-    return queue
+    def add_rectangle(self, r):
+        colors = ['CadetBlue4', 'turquoise1', 'salmon', 'red', 'green', 'blue', 'cyan', 'yellow', 'magenta', 'ivory4',
+                  'VioletRed3', 'DarkOrange3', 'lawn green', 'chocolate2', 'purple2', 'coral1', 'firebrick3']
+        self.canvas.create_rectangle(r[0]*1.5+10, r[1]+10, (r[0]+r[2])*1.5+10, (r[1]+r[3])*10, fill=colors[self.color_index], width=0)
+
+        if self.color_index == len(colors)-1:
+            self.color_index = 0
+        else:
+            self.color_index += 1
+
+    def finish(self):
+        tk.mainloop()
 
 
 def solve(shops):
     res = []
-    pos = 0
-    while shops[0][3] - shops[0][2] == 10:
+    border = 0
+    while shops[0][0] == 10:
         shop = shops.pop(0)
-        border[1] -= shop[1]
-        res.append([pos, 0, shop[2], shop[3]])
-        pos += shop[1]
-    print(border)
+        res.append([border, 0, shop[1], shop[0]])
+        border += shop[1]
     print(shops)
-    queue = shops.copy()
 
+    skyline = [border] * 10
+    print(skyline)
+    test = defaultdict(list)
+    for s in shops:
+        test[s[2]].append(s)
+    print(test)
+
+    sum = 0
+    for i in test:
+        sum += len(test[i])
+    print(sum)
     return res
 
 
 shops = read(1)
-border = [10, 1000]
-shops.sort(reverse=True)
+shops.sort(reverse=True)    # decreasing order
 print(shops)
 result = solve(shops)
 print(result)
+draw = Draw()
+for r in result:
+    draw.add_rectangle(r)
+
+draw.finish()
