@@ -1,6 +1,18 @@
+from functools import wraps
 from collections import defaultdict
 import tkinter as tk
 import time
+
+
+def timing(f):
+    @wraps(f)
+    def wrap(*args, **kw):
+        t0 = time()
+        result = f(*args, **kw)
+        t1 = time()
+        print("Durchlaufzeit: " + str(round((t1-t0)*1000000, 5)) + "ms")
+        return result
+    return wrap
 
 
 def read(example):
@@ -40,6 +52,16 @@ class Draw:
         tk.mainloop()
 
 
+# this algorithm defines the upper bound
+def greedy(queue):
+    space = 0
+
+
+
+    return space
+
+
+# branch and bound
 def solve(shops):
     res = []
     border = 0
@@ -51,15 +73,15 @@ def solve(shops):
 
     skyline = [border] * 10
     print(skyline)
-    test = defaultdict(list)
+    queue = defaultdict(list)
     for s in shops:
-        test[s[2]].append(s)
-    print(test)
+        queue[s[2]].append(s)
+    print(queue)
+    upper_bound = greedy(queue)
+    # create candidate solutions
+    while queue:
+        queue
 
-    sum = 0
-    for i in test:
-        sum += len(test[i])
-    print(sum)
     return res
 
 
