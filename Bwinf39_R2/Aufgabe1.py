@@ -11,7 +11,8 @@ def timing(f):
         t0 = time()
         result = f(*args, **kw)
         t1 = time()
-        print("Durchlaufzeit: " + str(round((t1-t0)*1000000, 5)) + "ms")
+        print("Durchlaufzeit: " + str(round((t1-t0)*1000, 5)) + "ms")
+        print()
         return result
     return wrap
 
@@ -62,6 +63,7 @@ class Draw:
         tk.mainloop()
 
 
+# fills the gap two the lowest nearest tower
 def close_gap(position, skyline, gap, points):
     if position[1] == 0:
         lowest = skyline[gap]
@@ -81,12 +83,13 @@ def close_gap(position, skyline, gap, points):
     return
 
 
+# returns a rectangle and its position
 def feasible_rectangle(points, queue, skyline, feasible_position=0):
     if feasible_position == 10:
         return 0, 0
     position = 0
     p = points.copy()
-    p.sort()
+    p.sort()    # getting Bottom left most points
     for e in p:
         if len(queue[e[1]]) != 0:
             if e[1] >= feasible_position:
@@ -135,6 +138,7 @@ def greedy(queue, skyline, res):
 
 
 # branch and bound
+@timing
 def solve(shops):
     res = []
     border = 0
@@ -148,17 +152,7 @@ def solve(shops):
         s.insert(0, s[0]*s[1])
         queue[s[3]].append(s)
     space = greedy(queue, skyline, res)
-    count = 1
-    print("Nicht angenommene Voranmeldungen: ")
-    for k in queue.values():
-        if k:
-            count = 0
-            for r in k:
-                print(str(r[2])+"m, "+str(r[3]+8)+"-"+str(r[4]+8)+" Uhr")
-    if count:
-        print("/")
-    print()
-    return res, space
+    return res, space, queue
 
 
 print("Geben Sie hier die Nummer des Beispiels ein (1-7):")
@@ -167,10 +161,21 @@ shops = read(choice)
 shops.sort(reverse=True)    # decreasing order
 draw = Draw()
 
-result, space = solve(shops)
-
-for r in result:
+res, space, queue = solve(shops)
+count = 1
+print("Nicht angenommene Voranmeldungen: ")
+for k in queue.values():
+    if k:
+        count = 0
+        for r in k:
+            print(str(r[2])+"m, "+str(r[3]+8)+"-"+str(r[4]+8)+" Uhr")
+if count:
+    print("/")
+print()
+print("Angenommene Voranmeldungen: ")
+for r in res:
     draw.add_rectangle(r)
+print()
 
 print("Einnahmen:", str(space)+"€")
 draw.finish(space)

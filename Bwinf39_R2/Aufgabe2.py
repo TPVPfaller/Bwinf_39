@@ -38,47 +38,56 @@ def read(example):
                 skewers[-1].append(line.replace("\n", "").split(" "))
                 for j in line.replace("\n", "").split(" "):
                     fruits.add(j)
-    # Erstellen eines Spiesses mit allen Früchten aus allen Schüsseln
-    skewers.append([[i for i in range(1, amount+1)], list(fruits)])
+    # Erstellen eines Spiesses mit allen Früchten (Wenn diese bekannt sind) aus allen Schüsseln
+    if len(fruits) == amount:
+        skewers.append([[i for i in range(1, amount + 1)], list(fruits)])
     return wishes, skewers
 
 
-def solve(queue):
+def solve(skewers):
     solved_fruits = []
     positions = []
-    last_queue = []
-    # Wird beendet wenn die Schüsseln bestimmt wurden oder es keine weiteren Kombinationsmöglichkeiten gibt
+    last_skewers = []
+    # Wird beendet wenn die Obstsorten bestimmt wurden oder es keine weiteren Kombinationsmöglichkeiten gibt
+
+    count = 0
     while wishes not in solved_fruits:
-        print(queue)
-        if last_queue == queue:
+        if last_skewers == skewers:
             break
-        last_queue = queue.copy()
-        for i in range(len(queue)):
-            # Spiesse mit nur einer Obstsorte sind genau zuordenbar
-            if len(queue[i][0]) == 1:
-                if queue[i][1][0] in wishes:
-                    positions.append(queue[i][0][0])
-                    solved_fruits.append(queue[i][1][0])
-                queue = remove_fruit(queue, queue[i][0][0], queue[i][1][0])
-            for j in range(i+1, len(queue)):
+        last_skewers = skewers.copy()
+        count += 1
+        for i in range(len(skewers)):
+            # Spiesse mit nur einer Schüssel sind genau zuordenbar
+            if len(skewers[i][0]) == 1:
+                if skewers[i][1][0] in wishes:
+                    positions.append(skewers[i][0][0])
+                    solved_fruits.append(skewers[i][1][0])
+                skewers = remove_fruit(skewers, skewers[i][0][0], skewers[i][1][0])
+                continue
+            for j in range(i+1, len(skewers)):
+
                 # Schnittmenge aus den Obstsorten und den dazugehörigen Schüsseln
-                intersection = [list(set(queue[i][0]) & set(queue[j][0])), list(set(queue[i][1]) & set(queue[j][1]))]
-                if len(intersection[0]) < len(queue[i][0]) + len(queue[j][0]) and len(intersection[0]) != 0:
+                intersection = [list(set(skewers[i][0]) & set(skewers[j][0])), list(set(skewers[i][1]) & set(skewers[j][1]))]
+                if len(intersection[0]) < len(skewers[i][0]) + len(skewers[j][0]) and len(intersection[0]) != 0:
                     if len(intersection[0]) == 1:   # Schüssel genau zuordenbar
                         if intersection[1][0] in wishes:
                             positions.append(intersection[0][0])
                             solved_fruits.append(intersection[1][0])
-                        queue = remove_fruit(queue, intersection[0][0], intersection[1][0])
+                        skewers = remove_fruit(skewers, intersection[0][0], intersection[1][0])
                     else:   # Schnittmenge wird als neuer Spieß dem Queue hinzugefügt und aus den beiden anderen gelöscht
                         for x in range(len(intersection[0])):
                             p, f = intersection[0][x], intersection[1][x]
-                            del queue[i][0][queue[i][0].index(p)]
-                            del queue[i][1][queue[i][1].index(f)]
-                            del queue[j][0][queue[j][0].index(p)]
-                            del queue[j][1][queue[j][1].index(f)]
-                        queue.append(intersection)
+                            skewers[i][0].remove(p)
+                            skewers[i][1].remove(f)
+                            skewers[j][0].remove(p)
+                            skewers[j][1].remove(f)
+                            #del skewers[i][0][skewers[i][0].index(p)]
+                            #del skewers[i][1][skewers[i][1].index(f)]
+                            #del skewers[j][0][skewers[j][0].index(p)]
+                            #del skewers[j][1][skewers[j][1].index(f)]
+                        skewers.append(intersection)
 
-    return solved_fruits, positions, queue
+    return solved_fruits, positions, skewers
 
 
 # Entfernt eine Obstsorte aus dem Queue
@@ -97,7 +106,7 @@ def print_output():
             positions[j]) + '\033[0m')
     print()
     if len(solved_fruits) < len(wishes):
-        for q in queue:
+        for q in remaining:
             if len(q[0]) != 0:
                 count = 1
                 for e in q[1]:
@@ -123,9 +132,9 @@ if choice == 'a':
     for i in range(0, 8):
         print("spiesse"+ str(i) + ".txt:")
         wishes, skewers = read(str(i))
-        solved_fruits, positions, queue = solve(skewers)
+        solved_fruits, positions, remaining = solve(skewers)
         print_output()
 else:
     wishes, skewers = read(choice)
-    solved_fruits, positions, queue = solve(skewers)
+    solved_fruits, positions, remaining = solve(skewers)
     print_output()
