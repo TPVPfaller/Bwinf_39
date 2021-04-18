@@ -2,8 +2,7 @@ from functools import wraps
 from collections import defaultdict
 import tkinter as tk
 from time import time
-from operator import add
-from functools import reduce
+from operator import itemgetter
 
 
 def timing(f):
@@ -34,18 +33,17 @@ class Draw:
     def __init__(self):
         root = tk.Tk()
         root.title("Aufgabe1")
-        root.geometry("1520x320+0+0")
+        root.geometry("1620x300+0+0")
         self.color_index = 0
-        self.canvas = tk.Canvas(root, bg="white", height=320, width=1520)
-        self.canvas.create_rectangle(10, 10, 1510, 210)
+        self.canvas = tk.Canvas(root, bg="white", height=300, width=1620)
+        self.canvas.create_rectangle(60, 10, 1560, 210)
         self.canvas.pack()
 
     def add_rectangle(self, r):
         colors = ['CadetBlue4', 'sandy brown', 'red', 'green', 'blue', 'cyan', 'yellow', 'magenta', 'ivory4',
-                  'grey76', 'DarkOrange4', 'lawn green', 'purple2', 'coral1', 'firebrick4']
-        print(r)
-        print(colors[self.color_index] + ":", str(r[0]) + "m" + ", " + str(r[1]+8) + "-" + str(r[3]+r[1]+8) + " Uhr")
-        self.canvas.create_rectangle(r[0]*1.5+10, r[1]*20+10, (r[0]+r[2])*1.5+10, (r[1]+r[3])*20+10, fill=colors[self.color_index], width=0)
+                  'grey76', 'DarkOrange4', 'dark khaki', 'lawn green', 'purple2', 'coral1', 'firebrick4', 'plum1']
+        print(colors[self.color_index] + ":", str(r[0])+"m, "+str(r[2])+"m, "+str(r[1]+8)+"-"+str(r[3]+r[1]+8)+" Uhr")
+        self.canvas.create_rectangle(r[0]*1.5+60, r[1]*20+10, (r[0]+r[2])*1.5+60, (r[1]+r[3])*20+10, fill=colors[self.color_index], width=0)
 
         if self.color_index == len(colors)-1:
             self.color_index = 0
@@ -53,10 +51,14 @@ class Draw:
             self.color_index += 1
 
     def finish(self, space):
-        self.canvas.create_text(150, 250, fill="black", font="Times 15 bold",
-                                text="Umsatz: "+str(space)+"€")
+        self.canvas.create_text(120, 260, fill="black", font="Times 15 bold", text="Einnahmen: "+str(space)+"€")
+        for i in range(11):
+            self.canvas.create_text(40, 9 + i*20, fill="black", font="Times 10", text=str(i+8) + " Uhr")
+
+        for i in range(11):
+            self.canvas.create_text(i*150+63, 220, fill="black", font="Times 10", text=str(i*100) + " m")
         for i in range(1, 10):
-            self.canvas.create_line(10, 10+(20*i), 1510, 10+(20*i))
+            self.canvas.create_line(60, 10+(20*i), 1560, 10+(20*i))
         tk.mainloop()
 
 
@@ -90,11 +92,6 @@ def feasible_rectangle(points, queue, skyline, feasible_position=0):
             if e[1] >= feasible_position:
                 position = e
                 break
-        else:
-            for s in range(e[1]+1, 10):
-                if skyline[s] > e[0]:
-                    close_gap(e, skyline, s, points)
-                    break
     if position == 0:
         return 0, 0
     count = 0
@@ -118,9 +115,11 @@ def feasible_rectangle(points, queue, skyline, feasible_position=0):
 
 
 def greedy(queue, skyline, res):
-    space = 0
+    space = skyline[0]*10
     for k in queue:
-        queue[k].sort(reverse=True)
+        # Sort by width (meters)
+        sorted(queue[k], key=itemgetter(2))
+        #queue[k].sort(reverse=True)
     points = [[skyline[0], i] for i in range(10)]
 
     while queue:
@@ -154,7 +153,8 @@ def solve(shops):
     for k in queue.values():
         if k:
             count = 0
-            print(k, end=" ")
+            for r in k:
+                print(str(r[2])+"m, "+str(r[3]+8)+"-"+str(r[4]+8)+" Uhr")
     if count:
         print("/")
     print()
@@ -172,5 +172,5 @@ result, space = solve(shops)
 for r in result:
     draw.add_rectangle(r)
 
-print("Umsatz:", space)
+print("Einnahmen:", str(space)+"€")
 draw.finish(space)
