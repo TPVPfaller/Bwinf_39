@@ -113,20 +113,14 @@ def feasible_rectangle(points, queue, skyline, feasible_position=0):
     # if not all rectangles exceed the limit 1000
     if count != len(queue[position[1]]):
         close_gap(position, skyline, gap, points)
-
     return feasible_rectangle(points, queue, skyline, feasible_position+1)
 
-
-def greedy(queue, skyline, res):
+def greedy(rect_dict, skyline, res):
     space = skyline[0]*10
-    for k in queue:
-        # Sort by width (meters)
-        sorted(queue[k], key=itemgetter(2))
-        #queue[k].sort(reverse=True)
     points = [[skyline[0], i] for i in range(10)]
 
-    while queue:
-        pos, rectangle = feasible_rectangle(points, queue, skyline)
+    while rect_dict:
+        pos, rectangle = feasible_rectangle(points, rect_dict, skyline)
         if rectangle == 0:
             return space
         for i in range(rectangle[3], rectangle[4]):
@@ -147,12 +141,12 @@ def solve(shops):
         res.append([border, 0, shop[1], shop[0]])
         border += shop[1]
     skyline = [border] * 10
-    queue = defaultdict(list)
+    rect_dict = defaultdict(list)
     for s in shops:
         s.insert(0, s[0]*s[1])
-        queue[s[3]].append(s)
-    space = greedy(queue, skyline, res)
-    return res, space, queue
+        rect_dict[s[3]].append(s)
+    space = greedy(rect_dict, skyline, res)
+    return res, space, rect_dict
 
 
 print("Geben Sie hier die Nummer des Beispiels ein (1-7):")
@@ -161,10 +155,10 @@ shops = read(choice)
 shops.sort(reverse=True)    # decreasing order
 draw = Draw()
 
-res, space, queue = solve(shops)
+res, space, rect_dict = solve(shops)
 count = 1
 print("Nicht angenommene Voranmeldungen: ")
-for k in queue.values():
+for k in rect_dict.values():
     if k:
         count = 0
         for r in k:
