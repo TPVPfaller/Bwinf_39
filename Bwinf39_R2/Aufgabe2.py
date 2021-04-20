@@ -81,10 +81,6 @@ def solve(skewers):
                             skewers[i][1].remove(f)
                             skewers[j][0].remove(p)
                             skewers[j][1].remove(f)
-                            #del skewers[i][0][skewers[i][0].index(p)]
-                            #del skewers[i][1][skewers[i][1].index(f)]
-                            #del skewers[j][0][skewers[j][0].index(p)]
-                            #del skewers[j][1][skewers[j][1].index(f)]
                         skewers.append(intersection)
 
     return solved_fruits, positions, skewers
@@ -126,7 +122,7 @@ def print_output():
                 print("\n")
 
 
-print("Geben Sie hier die Nummer des Beispiels ein (0-7 oder 'a' um alle auszugeben):")
+print("Geben Sie hier die Nummer eines Beispiels ein (0-7 oder 'a' um alle auszugeben):")
 choice = input()
 if choice == 'a':
     for i in range(0, 8):

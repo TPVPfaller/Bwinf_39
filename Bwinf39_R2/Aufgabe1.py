@@ -2,7 +2,6 @@ from functools import wraps
 from collections import defaultdict
 import tkinter as tk
 from time import time
-from operator import itemgetter
 
 
 def timing(f):
@@ -55,7 +54,6 @@ class Draw:
         self.canvas.create_text(120, 260, fill="black", font="Times 15 bold", text="Einnahmen: "+str(space)+"€")
         for i in range(11):
             self.canvas.create_text(40, 9 + i*20, fill="black", font="Times 10", text=str(i+8) + " Uhr")
-
         for i in range(11):
             self.canvas.create_text(i*150+63, 220, fill="black", font="Times 10", text=str(i*100) + " m")
         for i in range(1, 10):
@@ -84,21 +82,21 @@ def close_gap(position, skyline, gap, points):
 
 
 # returns a rectangle and its position
-def feasible_rectangle(points, queue, skyline, feasible_position=0):
-    if feasible_position == 10:
+def feasible_rectangle(points, rect_dict, skyline, feasible_pos=0):
+    if feasible_pos == 10:
         return 0, 0
     position = 0
     p = points.copy()
     p.sort()    # getting Bottom left most points
     for e in p:
-        if len(queue[e[1]]) != 0:
-            if e[1] >= feasible_position:
+        if len(rect_dict[e[1]]) != 0:
+            if e[1] >= feasible_pos:
                 position = e
                 break
     if position == 0:
         return 0, 0
     count = 0
-    for r in queue[position[1]]:
+    for r in rect_dict[position[1]]:
         gap = 0
         for e in range(r[3] + 1, r[4]):
             if skyline[e] > position[0]:
@@ -108,12 +106,13 @@ def feasible_rectangle(points, queue, skyline, feasible_position=0):
             if position[0] + r[2] > 1000:
                 count += 1
                 continue
-            queue[position[1]].remove(r)
+            rect_dict[position[1]].remove(r)
             return position, r
     # if not all rectangles exceed the limit 1000
-    if count != len(queue[position[1]]):
+    if count != len(rect_dict[position[1]]):
         close_gap(position, skyline, gap, points)
-    return feasible_rectangle(points, queue, skyline, feasible_position+1)
+    return feasible_rectangle(points, rect_dict, skyline, feasible_pos+1)
+
 
 def greedy(rect_dict, skyline, res):
     space = skyline[0]*10
@@ -131,7 +130,6 @@ def greedy(rect_dict, skyline, res):
     return space
 
 
-# branch and bound
 @timing
 def solve(shops):
     res = []
@@ -149,7 +147,7 @@ def solve(shops):
     return res, space, rect_dict
 
 
-print("Geben Sie hier die Nummer des Beispiels ein (1-7):")
+print("Geben Sie hier die Nummer eines Beispiels ein (1-7):")
 choice = input()
 shops = read(choice)
 shops.sort(reverse=True)    # decreasing order
@@ -170,6 +168,5 @@ print("Angenommene Voranmeldungen: ")
 for r in res:
     draw.add_rectangle(r)
 print()
-
 print("Einnahmen:", str(space)+"€")
 draw.finish(space)
